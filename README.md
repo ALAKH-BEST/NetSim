@@ -1,11 +1,11 @@
 # NetSim — Interactive Network & Distributed Systems Simulator
 
-> **Difficulty:** 8.5/10 · **Status:** Production-Ready & Fully Tested  
+**Status:** Production-Ready & Fully Tested  
 > **Interactive Live Technical Demo:** Routing Algorithms, TCP Congestion Control, Chaos Engineering, and Real-Time Network Telemetry.
 
 ---
 
-## 🌟 What is NetSim?
+##  What is NetSim?
 
 **NetSim** is a visual, real-time interactive simulator for computer networks and distributed systems. It simulates packet routing, latency, packet loss, queue bufferbloat, node/link failures, and TCP congestion control, allowing you to observe how protocols and distributed topologies react in real time.
 
@@ -13,9 +13,9 @@ Built with high-performance HTML5 Canvas (60 FPS), modern responsive glassmorphi
 
 ---
 
-## 🚀 Key Features
+##  Key Features
 
-### 1. 🧭 Routing Engines & Strategy Comparison
+### 1.  Routing Engines & Strategy Comparison
 - **Dijkstra's Shortest Path First (SPF / OSPF style)**:
   - Computes optimal paths based on physical link propagation latency.
   - Dynamically recalculates routes when nodes fail or links are cut.
@@ -27,7 +27,7 @@ Built with high-performance HTML5 Canvas (60 FPS), modern responsive glassmorphi
 - **Dynamic Congestion-Aware Routing**:
   - Automatically adjusts edge metrics as router queues fill up, deflecting packets away from congested bottleneck links.
 
-### 2. ⚡ Full TCP Congestion Control (Reno / NewReno Model)
+### 2.  Full TCP Congestion Control (Reno / NewReno Model)
 - **Slow Start**: Exponential `cwnd` window growth ($+1\text{ MSS}$ per received ACK) doubling every RTT.
 - **Congestion Avoidance (AIMD)**: Linear additive increase ($+1/\lfloor cwnd \rfloor$ per ACK) once `cwnd >= ssthresh`.
 - **Fast Retransmit & Fast Recovery**:
@@ -41,13 +41,13 @@ Built with high-performance HTML5 Canvas (60 FPS), modern responsive glassmorphi
   - Exponential weighted moving averages: $SRTT = (1-\alpha)SRTT + \alpha RTT_{sample}$, $RTTVAR = (1-\beta)RTTVAR + \beta|SRTT - RTT_{sample}|$, $RTO = SRTT + 4 \times RTTVAR$.
 - **Live Sawtooth Chart**: Real-time canvas plot visualizing the classic TCP `cwnd` sawtooth curve, `ssthresh`, and in-flight segments.
 
-### 3. 💥 Chaos Engineering & Fault Injection
+### 3.  Chaos Engineering & Fault Injection
 - **Node Kills & Revivals**: Toggle any computer, router, or server offline; observe instant Dijkstra route re-convergence.
 - **Cable Cutting & Restoration**: Sever links mid-stream to trigger packet drops and dynamic rerouting.
 - **Link Degradation**: Introduce high packet loss (15%+) and elevated latency to test protocol resilience.
 - **Queue Bufferbloat & Overflow**: Throttle link bandwidth to watch router buffer queues fill up and tail-drop packets.
 
-### 4. 📊 Real-Time Telemetry & Wireshark-Style Sniffer
+### 4.  Real-Time Telemetry & Wireshark-Style Sniffer
 - **Network Operations Center (NOC) HUD**:
   - Live Throughput (Mbps)
   - Average Latency (ms)
@@ -60,7 +60,7 @@ Built with high-performance HTML5 Canvas (60 FPS), modern responsive glassmorphi
 
 ---
 
-## 🏛️ Pre-built Network Topologies
+##  Pre-built Network Topologies
 
 1. **ISP Backbone & Mesh Core**: Tier-1 ISP core with redundant multi-paths, edge routers, and cloud server backends.
 2. **Spine-Leaf Modern Datacenter**: Two-tier fabric with ECMP multi-path load balancing between spine and leaf switches.
@@ -70,7 +70,7 @@ Built with high-performance HTML5 Canvas (60 FPS), modern responsive glassmorphi
 
 ---
 
-## 🎮 Interactive Controls
+##  Interactive Controls
 
 | Interaction | Action |
 |-------------|--------|
@@ -86,7 +86,7 @@ Built with high-performance HTML5 Canvas (60 FPS), modern responsive glassmorphi
 
 ---
 
-## 🛠️ Getting Started
+##  Getting Started
 
 ### Method 1: 1-Click Launch (Windows)
 Double-click `run.bat` in the project directory:
@@ -107,7 +107,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🧪 Automated Unit Test Suite
+##  Automated Unit Test Suite
 
 NetSim includes an automated test suite verifying routing convergence, shortest-path calculation, and TCP state transitions:
 
@@ -127,7 +127,7 @@ node --test test/*.test.js
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 netsim/
