@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NetSim — Interactive Network & Distributed Systems Simulator</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS (compiled or CDN for zero-dependency high speed) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              cyber: {
+                dark: '#070b13',
+                panel: '#0e1526',
+                border: '#1e293b',
+                cyan: '#06b6d4',
+                emerald: '#10b981',
+                amber: '#f59e0b',
+                rose: '#f43f5e'
+              }
+            },
+            fontFamily: {
+              mono: ['"JetBrains Mono"', 'monospace'],
+              sans: ['"Outfit"', 'sans-serif']
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="./css/styles.css">
+  </head>
+  <body class="bg-[#070b13] text-slate-100 flex flex-col h-screen w-screen overflow-hidden select-none font-sans">
+    
+    <!-- TOP NAVIGATION BAR -->
+    <header class="glass-nav h-14 px-4 flex items-center justify-between z-20 shrink-0">
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="16" height="12" x="4" y="4" rx="2"></rect>
+            <circle cx="8" cy="20" r="1"></circle>
+            <circle cx="16" cy="20" r="1"></circle>
+            <path d="M12 16v4"></path>
+            <path d="M4 20h16"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-base tracking-tight text-white">NetSim</h1>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-950 text-cyan-400 border border-cyan-800 tracking-wider">v2.0</span>
+          </div>
+          <p class="text-[11px] text-slate-400 -mt-0.5">Interactive Network & Distributed Systems Simulator</p>
+        </div>
+      </div>
+
+      <!-- Playback & Speed Controls -->
+      <div class="flex items-center gap-2 bg-[#0c1424] px-3 py-1.5 rounded-xl border border-slate-800">
+        <!-- Play / Pause -->
+        <button id="btn-play-pause" class="btn btn-primary py-1 px-3 text-xs" title="Pause / Resume simulation">
+          <svg id="icon-pause" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+          <svg id="icon-play" class="hidden" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span id="play-pause-text">Pause</span>
+        </button>
+
+        <!-- Step Tick -->
+        <button id="btn-step" class="btn btn-secondary py-1 px-2.5 text-xs" title="Advance simulation by 1 tick">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg>
+          Step
+        </button>
+
+        <!-- Speed Multiplier -->
+        <div class="flex items-center gap-1 pl-2 border-l border-slate-700 text-xs">
+          <span class="text-slate-400 font-mono text-[11px]">Speed:</span>
+          <select id="select-speed" class="bg-slate-900 border-none text-cyan-400 font-mono text-xs py-0.5 px-1 rounded cursor-pointer">
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.5x</option>
+            <option value="1.0" selected>1.0x</option>
+            <option value="2.0">2.0x</option>
+            <option value="5.0">5.0x</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Live NOC HUD Metrics -->
+      <div class="flex items-center gap-4 bg-[#0a101d] px-3.5 py-1.5 rounded-xl border border-slate-800 text-xs font-mono">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-emerald"></span>
+          <span class="text-slate-400 text-[11px]">Throughput:</span>
+          <span id="hud-throughput" class="text-cyan-400 font-bold">0.00 Mbps</span>
+        </div>
+        <div class="w-px h-3.5 bg-slate-800"></div>
+        <div>
+          <span class="text-slate-400 text-[11px]">Avg Latency:</span>
+          <span id="hud-latency" class="text-amber-400 font-bold">0 ms</span>
+        </div>
+        <div class="w-px h-3.5 bg-slate-800"></div>
+        <div>
+          <span class="text-slate-400 text-[11px]">Loss:</span>
+          <span id="hud-loss" class="text-red-400 font-bold">0.0%</span>
+        </div>
+        <div class="w-px h-3.5 bg-slate-800"></div>
+        <div>
+          <span class="text-slate-400 text-[11px]">In-Flight:</span>
+          <span id="hud-inflight" class="text-emerald-400 font-bold">0 pkts</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button id="btn-add-node-modal" class="btn btn-secondary py-1 px-2.5 text-xs">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Add Node
+        </button>
+        <button id="btn-clear-traffic" class="btn btn-secondary py-1 px-2.5 text-xs text-slate-300" title="Flush all in-flight packets and buffer queues">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          Flush
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+      <!-- LEFT: VISUAL TOPOLOGY CANVAS & BOTTOM TELEMETRY DRAWER -->
+      <div class="flex-1 flex flex-col overflow-hidden relative">
+        
+        <!-- Canvas Viewport -->
+        <div id="canvas-container" class="flex-1 relative cursor-default">
+          <canvas id="topology-canvas" class="w-full h-full block"></canvas>
+
+          <!-- Canvas Overlay Controls (Top-Left) -->
+          <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-[#0e1628]/90 backdrop-blur border border-slate-800 rounded-lg p-1 text-slate-300 shadow-xl">
+            <button id="btn-zoom-in" class="p-1.5 hover:bg-slate-800 rounded text-slate-300 hover:text-white transition" title="Zoom In">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+            </button>
+            <button id="btn-zoom-out" class="p-1.5 hover:bg-slate-800 rounded text-slate-300 hover:text-white transition" title="Zoom Out">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+            </button>
+            <button id="btn-zoom-reset" class="p-1.5 hover:bg-slate-800 rounded text-slate-300 hover:text-white transition text-xs font-mono px-2" title="Reset View">
+              100%
+            </button>
+            <div class="w-px h-4 bg-slate-700 mx-0.5"></div>
+            <div class="text-[11px] text-slate-400 px-2 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+              Tip: Shift+Drag between nodes to create link
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM TELEMETRY DRAWER (TCP Chart & Wireshark Log) -->
+        <div id="telemetry-drawer" class="h-64 border-t border-slate-800 flex bg-[#090e1a] shrink-0">
+          
+          <!-- Left: TCP cwnd Sawtooth Chart -->
+          <div class="w-1/2 flex flex-col border-r border-slate-800">
+            <div class="flex items-center justify-between px-3 py-1.5 border-b border-slate-800/80 bg-[#0c1424] text-xs">
+              <span class="font-semibold text-slate-200 flex items-center gap-1.5">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                TCP CONGESTION CONTROL (CWND SAWTOOTH)
+              </span>
+              <span class="text-[11px] text-slate-400 font-mono">AIMD · Slow-Start · Fast-Recovery</span>
+            </div>
+            <div class="flex-1 relative p-1">
+              <canvas id="tcp-chart-canvas" class="w-full h-full block"></canvas>
+            </div>
+          </div>
+
+          <!-- Right: Wireshark Packet Sniffer Log -->
+          <div id="packet-log-container" class="w-1/2 flex flex-col">
+            <!-- Rendered by PacketLogViewer -->
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT: INSPECTOR & CHAOS PANEL -->
+      <aside id="inspector-panel-container" class="w-96 border-l border-slate-800 shrink-0">
+        <!-- Rendered by InspectorPanel -->
+      </aside>
+
+    </div>
+
+    <!-- ADD NODE MODAL -->
+    <div id="modal-add-node" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+      <div class="glass-panel w-96 p-5 space-y-4 border border-cyan-500/30">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-base text-white">Add Network Node</h3>
+          <button id="btn-close-modal" class="text-slate-400 hover:text-white">&times;</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <label class="text-slate-400 font-mono">Node Name</label>
+            <input type="text" id="new-node-name" value="Router Core 3" class="w-full mt-1 bg-[#0f172a] border border-slate-700 text-slate-200 rounded p-2 outline-none focus:border-cyan-500">
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-mono">Node Type</label>
+            <select id="new-node-type" class="w-full mt-1 bg-[#0f172a] border border-slate-700 text-slate-200 rounded p-2">
+              <option value="router">Router (OSPF / Routing)</option>
+              <option value="client">Client (Computer / Workstation)</option>
+              <option value="server">Server (Web / Database Host)</option>
+              <option value="switch">Switch (Spine / Leaf Layer)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-slate-400 font-mono">IP Address</label>
+            <input type="text" id="new-node-ip" value="10.10.3.1" class="w-full mt-1 bg-[#0f172a] border border-slate-700 text-slate-200 rounded p-2 outline-none focus:border-cyan-500">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button id="btn-cancel-add-node" class="btn btn-secondary text-xs">Cancel</button>
+          <button id="btn-confirm-add-node" class="btn btn-primary text-xs">Create Node</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Application Script -->
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
